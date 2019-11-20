@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Amazon FreeRTOS POSIX V1.1.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -34,10 +34,10 @@
 #define _FREERTOS_POSIX_SCHED_H_
 
 /**
- * @brief Scheduling Policies
+ * @name Scheduling Policies
  */
 /**@{ */
-#define SCHED_OTHER       0 /**< Another scheduling policy. */
+#define SCHED_OTHER    0    /**< Another scheduling policy. */
 /**@} */
 
 /**
@@ -50,18 +50,27 @@ struct sched_param
 };
 
 /**
- * @brief Get priority limit.
+ * @brief Get priority limit (max).
  *
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sched_get_priority_max.html
  *
  * @note policy is ignored.
  *
- * @return the maxium priority value (0-based) system configuration allows. 
+ * @return the maximum priority value (0-based) system configuration allows.
  * <br>
- * e.g. if configMAX_PRIORITIES == 7, this function returns (configMAX_PRIORITIES - 1). 
- * configMAX_PRIORITIES is configured in appication FreeRTOSConfig.h file. 
+ * e.g. if configMAX_PRIORITIES == 7, this function returns (configMAX_PRIORITIES - 1).
+ * configMAX_PRIORITIES is configured in application FreeRTOSConfig.h file.
  */
 int sched_get_priority_max( int policy );
+
+/**
+ * @brief Get priority limit (min).
+ *
+ * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sched_get_priority_min.html
+ *
+ * @note policy is ignored.
+ */
+int sched_get_priority_min( int policy );
 
 /**
  * @brief Yield the processor.

@@ -1,5 +1,5 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
+ * Amazon FreeRTOS POSIX V1.1.0
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -35,7 +35,7 @@
 
 /* FreeRTOS+POSIX platform-specific configuration headers. */
 #include "FreeRTOS_POSIX_portable.h"
-#include "portable/FreeRTOS_POSIX_portable_default.h"
+#include "FreeRTOS_POSIX_portable_default.h"
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"

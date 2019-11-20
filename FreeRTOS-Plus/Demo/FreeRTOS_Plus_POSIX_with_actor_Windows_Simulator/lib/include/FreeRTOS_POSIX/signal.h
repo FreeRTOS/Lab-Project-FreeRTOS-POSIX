@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Amazon FreeRTOS POSIX V1.1.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -38,7 +38,7 @@
 #define _FREERTOS_POSIX_SIGNAL_H_
 
 /**
- * @brief Values of sigev_notify.
+ * @name Values of sigev_notify.
  */
 /**@{ */
 #define SIGEV_NONE      0 /**< No asynchronous notification is delivered when the event of interest occurs. */
@@ -60,11 +60,11 @@ union sigval
  */
 struct sigevent
 {
-    int sigev_notify;                                  /**< Notification type. A value of SIGEV_SIGNAL is not supported. */
-    int sigev_signo;                                   /**< Signal number. This member is ignored. */
-    union sigval sigev_value;                          /**< Signal value. Only the sival_ptr member is used. */
-    void ( * sigev_notify_function ) ( union sigval ); /**< Notification function. */
-    pthread_attr_t * sigev_notify_attributes;          /**< Notification attributes. */
+    int sigev_notify;                                 /**< Notification type. A value of SIGEV_SIGNAL is not supported. */
+    int sigev_signo;                                  /**< Signal number. This member is ignored. */
+    union sigval sigev_value;                         /**< Signal value. Only the sival_ptr member is used. */
+    void ( * sigev_notify_function )( union sigval ); /**< Notification function. */
+    pthread_attr_t * sigev_notify_attributes;         /**< Notification attributes. */
 };
 
 #endif /* ifndef _FREERTOS_POSIX_SIGNAL_H_ */

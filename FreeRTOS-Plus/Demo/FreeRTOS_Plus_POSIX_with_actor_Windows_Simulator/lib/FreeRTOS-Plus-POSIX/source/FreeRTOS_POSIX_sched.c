@@ -1,5 +1,5 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
+ * Amazon FreeRTOS POSIX V1.1.0
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -44,9 +44,21 @@ int sched_get_priority_max( int policy )
 
 /*-----------------------------------------------------------*/
 
+int sched_get_priority_min( int policy )
+{
+    /* Silence warnings about unused parameters. */
+    ( void ) policy;
+
+    return tskIDLE_PRIORITY;
+}
+
+/*-----------------------------------------------------------*/
+
 int sched_yield( void )
 {
     taskYIELD();
 
     return 0;
 }
+
+/*-----------------------------------------------------------*/

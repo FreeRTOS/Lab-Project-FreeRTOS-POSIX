@@ -1,5 +1,5 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
+ * Amazon FreeRTOS POSIX V1.1.0
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -37,24 +37,17 @@
 #include "FreeRTOS_POSIX/semaphore.h"
 #include "FreeRTOS_POSIX/utils.h"
 
-/**
- * @brief Semaphore type.
- */
-typedef struct
-{
-    StaticSemaphore_t xSemaphore; /**< FreeRTOS semaphore. */
-} sem_internal_t;
+#include "atomic.h"
 
 
 /*-----------------------------------------------------------*/
 
 int sem_destroy( sem_t * sem )
 {
-    sem_internal_t * pxSem = ( sem_internal_t * ) ( *sem );
+    sem_internal_t * pxSem = ( sem_internal_t * ) ( sem );
 
     /* Free the resources in use by the semaphore. */
     vSemaphoreDelete( ( SemaphoreHandle_t ) &pxSem->xSemaphore );
-    vPortFree( pxSem );
 
     return 0;
 }
@@ -64,10 +57,14 @@ int sem_destroy( sem_t * sem )
 int sem_getvalue( sem_t * sem,
                   int * sval )
 {
-    sem_internal_t * pxSem = ( sem_internal_t * ) ( *sem );
+    sem_internal_t * pxSem = ( sem_internal_t * ) ( sem );
 
-    /* Get the semaphore count using the FreeRTOS API. */
-    *sval = ( int ) uxSemaphoreGetCount( ( SemaphoreHandle_t ) &pxSem->xSemaphore );
+    /* Get value does not need atomic operation, since -- Open Group
+     * states "the updated value represents an actual semaphore value that
+     * occurred at some unspecified time during the call, but it need not be the
+     * actual value of the semaphore when it is returned to the calling process."
+     */
+    *sval = pxSem->value;
 
     return 0;
 }
@@ -79,7 +76,7 @@ int sem_init( sem_t * sem,
               unsigned value )
 {
     int iStatus = 0;
-    sem_internal_t * pxSem = NULL;
+    sem_internal_t * pxSem = ( sem_internal_t * ) ( sem );
 
     /* Silence warnings about unused parameters. */
     ( void ) pshared;
@@ -91,24 +88,17 @@ int sem_init( sem_t * sem,
         iStatus = -1;
     }
 
-    /* Allocate memory for a new semaphore. */
+    /* value is guaranteed to not exceed INT32_MAX, which is the default value of SEM_VALUE_MAX (0x7FFFU). */
+    pxSem->value = ( int ) value;
+
+    /* Create the FreeRTOS semaphore.
+     * This is only used to queue threads when no semaphore is available.
+     * Initializing with semaphore initial count zero.
+     * This call will not fail because the memory for the semaphore has already been allocated.
+     */
     if( iStatus == 0 )
     {
-        pxSem = pvPortMalloc( sizeof( sem_internal_t ) );
-
-        if( pxSem == NULL )
-        {
-            errno = ENOSPC;
-            iStatus = -1;
-        }
-    }
-
-    /* Create the FreeRTOS semaphore. This call will not fail because the
-     * memory for the semaphore has already been allocated. */
-    if( iStatus == 0 )
-    {
-        ( void ) xSemaphoreCreateCountingStatic( SEM_VALUE_MAX, value, &pxSem->xSemaphore );
-        *sem = pxSem;
+        ( void ) xSemaphoreCreateCountingStatic( SEM_VALUE_MAX, 0, &pxSem->xSemaphore );
     }
 
     return iStatus;
@@ -118,10 +108,18 @@ int sem_init( sem_t * sem,
 
 int sem_post( sem_t * sem )
 {
-    sem_internal_t * pxSem = ( sem_internal_t * ) ( *sem );
+    sem_internal_t * pxSem = ( sem_internal_t * ) ( sem );
 
-    /* Give the semaphore using the FreeRTOS API. */
-    ( void ) xSemaphoreGive( ( SemaphoreHandle_t ) &pxSem->xSemaphore );
+    int iPreviouValue = Atomic_Increment_u32( ( uint32_t * ) &pxSem->value );
+
+    /* If previous semaphore value is equal or larger than zero, there is no
+     * thread waiting for this semaphore. Otherwise (<0), call FreeRTOS interface
+     * to wake up a thread. */
+    if( iPreviouValue < 0 )
+    {
+        /* Give the semaphore using the FreeRTOS API. */
+        ( void ) xSemaphoreGive( ( SemaphoreHandle_t ) &pxSem->xSemaphore );
+    }
 
     return 0;
 }
@@ -132,7 +130,7 @@ int sem_timedwait( sem_t * sem,
                    const struct timespec * abstime )
 {
     int iStatus = 0;
-    sem_internal_t * pxSem = ( sem_internal_t * ) ( *sem );
+    sem_internal_t * pxSem = ( sem_internal_t * ) ( sem );
     TickType_t xDelay = portMAX_DELAY;
 
     if( abstime != NULL )
@@ -146,7 +144,17 @@ int sem_timedwait( sem_t * sem,
         }
         else
         {
-            iStatus = UTILS_AbsoluteTimespecToTicks( abstime, &xDelay );
+            struct timespec xCurrentTime = { 0 };
+
+            /* Get current time */
+            if( clock_gettime( CLOCK_REALTIME, &xCurrentTime ) != 0 )
+            {
+                iStatus = EINVAL;
+            }
+            else
+            {
+                iStatus = UTILS_AbsoluteTimespecToDeltaTicks( abstime, &xCurrentTime, &xDelay );
+            }
 
             /* If abstime was in the past, still attempt to take the semaphore without
              * blocking, per POSIX spec. */
@@ -157,16 +165,37 @@ int sem_timedwait( sem_t * sem,
         }
     }
 
-    /* Take the semaphore using the FreeRTOS API. */
-    if( xSemaphoreTake( ( SemaphoreHandle_t ) &pxSem->xSemaphore,
-                        xDelay ) != pdTRUE )
+    int iPreviousValue = Atomic_Decrement_u32( ( uint32_t * ) &pxSem->value );
+
+    /* If previous semaphore value is larger than zero, the thread entering this function call
+     * can take the semaphore without yielding. Else (<=0), calling into FreeRTOS API to yield.
+     */
+    if( iPreviousValue > 0 )
     {
-        errno = iStatus;
-        iStatus = -1;
+        /* Under no circumstance shall the function fail with a timeout if the semaphore can be locked immediately. */
+        iStatus = 0;
     }
     else
     {
-        iStatus = 0;
+        /* Take the semaphore using the FreeRTOS API. */
+        if( xSemaphoreTake( ( SemaphoreHandle_t ) &pxSem->xSemaphore,
+                            xDelay ) != pdTRUE )
+        {
+            if( iStatus == 0 )
+            {
+                errno = ETIMEDOUT;
+            }
+            else
+            {
+                errno = iStatus;
+            }
+
+            iStatus = -1;
+        }
+        else
+        {
+            iStatus = 0;
+        }
     }
 
     return iStatus;

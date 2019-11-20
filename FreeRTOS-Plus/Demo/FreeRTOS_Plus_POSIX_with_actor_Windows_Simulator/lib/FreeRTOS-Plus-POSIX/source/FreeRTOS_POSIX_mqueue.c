@@ -1,5 +1,5 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
+ * Amazon FreeRTOS POSIX V1.1.0
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -142,7 +142,7 @@ static BaseType_t prvValidateQueueName( const char * const pcName,
 /**
  * @brief Guards access to the list of message queues.
  */
-static StaticSemaphore_t xQueueListMutex = { { 0 } };
+static StaticSemaphore_t xQueueListMutex = { { 0 }, .u = { 0 } };
 
 /**
  * @brief Head of the linked list of queues.
@@ -172,15 +172,23 @@ static int prvCalculateTickTimeout( long lMessageQueueFlags,
         }
         else
         {
+            struct timespec xCurrentTime = { 0 };
+
             /* Check that the given timespec is valid. */
             if( UTILS_ValidateTimespec( pxAbsoluteTimeout ) == false )
             {
                 iStatus = EINVAL;
             }
 
+            /* Get current time */
+            if( ( iStatus == 0 ) && ( clock_gettime( CLOCK_REALTIME, &xCurrentTime ) != 0 ) )
+            {
+                iStatus = EINVAL;
+            }
+
             /* Convert absolute timespec to ticks. */
             if( ( iStatus == 0 ) &&
-                ( UTILS_AbsoluteTimespecToTicks( pxAbsoluteTimeout, pxTimeoutTicks ) != 0 ) )
+                ( UTILS_AbsoluteTimespecToDeltaTicks( pxAbsoluteTimeout, &xCurrentTime, pxTimeoutTicks ) != 0 ) )
             {
                 iStatus = ETIMEDOUT;
             }
@@ -404,7 +412,7 @@ int mq_close( mqd_t mqdes )
     if( prvFindQueueInList( NULL, NULL, mqdes ) == pdTRUE )
     {
         /* Decrement the number of open descriptors. */
-        if(pxMessageQueue->xOpenDescriptors > 0)
+        if( pxMessageQueue->xOpenDescriptors > 0 )
         {
             pxMessageQueue->xOpenDescriptors--;
         }
@@ -494,7 +502,7 @@ mqd_t mq_open( const char * name,
     /* Default mq_attr. */
     struct mq_attr xQueueCreationAttr =
     {
-        .mq_flags   =                          0,
+        .mq_flags   = 0,
         .mq_maxmsg  = posixconfigMQ_MAX_MESSAGES,
         .mq_msgsize = posixconfigMQ_MAX_SIZE,
         .mq_curmsgs = 0
@@ -514,7 +522,7 @@ mqd_t mq_open( const char * name,
         xMessageQueue = ( mqd_t ) -1;
     }
 
-    /* Check attributes, if O_CREATE is specified and attr is given. */
+    /* Check attributes, if given. */
     if( xMessageQueue == NULL )
     {
         if( ( oflag & O_CREAT ) && ( attr != NULL ) && ( ( attr->mq_maxmsg <= 0 ) || ( attr->mq_msgsize <= 0 ) ) )

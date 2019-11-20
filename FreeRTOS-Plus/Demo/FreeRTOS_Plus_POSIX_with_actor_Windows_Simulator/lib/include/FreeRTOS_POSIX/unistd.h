@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Amazon FreeRTOS POSIX V1.1.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -33,16 +33,18 @@
 #ifndef _FREERTOS_POSIX_UNISTD_H_
 #define _FREERTOS_POSIX_UNISTD_H_
 
+#include "FreeRTOS_POSIX/sys/types.h"
+
 /**
  * @brief Suspend execution for an interval of time.
  *
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sleep.html
- * 
- * @param[in] seconds The number of seconds to suspend execution.
- * 
- * @retval 0 - Upon successful completion. 
  *
- * @note Return value of a positive number is not yet supported. 
+ * @param[in] seconds The number of seconds to suspend execution.
+ *
+ * @retval 0 - Upon successful completion.
+ *
+ * @note Return value of a positive number is not yet supported.
  */
 unsigned sleep( unsigned seconds );
 
@@ -52,7 +54,7 @@ unsigned sleep( unsigned seconds );
  * This is a useful, non-POSIX function.
  * @param[in] usec The number of microseconds to suspend execution.
  *
- * @retval 0 - Upon successful cocmpletion.
+ * @retval 0 - Upon successful completion.
  */
 int usleep( useconds_t usec );
 

@@ -90,9 +90,6 @@
     <ClCompile Include="..\..\..\FreeRTOS\Source\portable\MSVC-MingW\port.c">
       <Filter>lib\FreeRTOS\Portable\MSVC-W</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\FreeRTOS\Source\croutine.c">
-      <Filter>lib\FreeRTOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\FreeRTOS\Source\event_groups.c">
       <Filter>lib\FreeRTOS</Filter>
     </ClCompile>

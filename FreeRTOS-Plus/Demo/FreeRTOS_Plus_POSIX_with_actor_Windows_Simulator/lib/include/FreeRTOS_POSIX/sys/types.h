@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Amazon FreeRTOS POSIX V1.1.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -36,126 +36,156 @@
 /* C standard library includes. */
 #include <stdint.h>
 
+/* FreeRTOS types include */
+#include "FreeRTOS_POSIX_types.h"
+
 /**
- * @brief Used for system times in clock ticks or CLOCKS_PER_SEC. 
+ * @brief Used for system times in clock ticks or CLOCKS_PER_SEC.
+ *
  * Enabled/disabled by posixconfigENABLE_CLOCK_T.
  */
 #if !defined( posixconfigENABLE_CLOCK_T ) || ( posixconfigENABLE_CLOCK_T == 1 )
-    typedef uint32_t        clock_t;
+    typedef uint32_t                 clock_t;
 #endif
 
 /**
  * @brief Used for clock ID type in the clock and timer functions.
+ *
  * Enabled/disabled by posixconfigENABLE_CLOCKID_T.
  */
 #if !defined( posixconfigENABLE_CLOCKID_T ) || ( posixconfigENABLE_CLOCKID_T == 1 )
-    typedef int             clockid_t;
+    typedef int                      clockid_t;
 #endif
 
 /**
  * @brief Used for some file attributes.
+ *
  * Enabled/disabled by posixconfigENABLE_MODE_T.
  */
 #if !defined( posixconfigENABLE_MODE_T ) || ( posixconfigENABLE_MODE_T == 1 )
-    typedef int             mode_t;
+    typedef int                      mode_t;
 #endif
 
 /**
  * @brief Used for process IDs and process group IDs.
+ *
  * Enabled/disabled by posixconfigENABLE_PID_T.
  */
 #if !defined( posixconfigENABLE_PID_T ) || ( posixconfigENABLE_PID_T == 1 )
-    typedef int             pid_t;
+    typedef int                      pid_t;
 #endif
 
 /**
  * @brief Used to identify a thread attribute object.
+ *
  * Enabled/disabled by posixconfigENABLE_PTHREAD_ATTR_T.
  */
 #if !defined( posixconfigENABLE_PTHREAD_ATTR_T ) || ( posixconfigENABLE_PTHREAD_ATTR_T == 1 )
-    typedef void            * pthread_attr_t;
+    typedef PthreadAttrType_t        pthread_attr_t;
 #endif
 
 /**
  * @brief Used to identify a barrier.
+ *
+ * Enabled/disabled by posixconfigENABLE_PTHREAD_BARRIER_T.
  */
-typedef void                * pthread_barrier_t;
+#if !defined( posixconfigENABLE_PTHREAD_BARRIER_T ) || ( posixconfigENABLE_PTHREAD_BARRIER_T == 1 )
+    typedef PthreadBarrierType_t     pthread_barrier_t;
+#endif
 
 /**
  * @brief Used to define a barrier attributes object.
  */
-typedef void                * pthread_barrierattr_t;
+typedef void                         * pthread_barrierattr_t;
 
 /**
  * @brief Used for condition variables.
+ *
  * Enabled/disabled by posixconfigENABLE_PTHREAD_COND_T.
  */
 #if !defined( posixconfigENABLE_PTHREAD_COND_T ) || ( posixconfigENABLE_PTHREAD_COND_T == 1 )
-    typedef void            * pthread_cond_t;
+    typedef  PthreadCondType_t       pthread_cond_t;
 #endif
 
 /**
  * @brief Used to identify a condition attribute object.
+ *
  * Enabled/disabled by posixconfigENABLE_PTHREAD_CONDATTR_T.
  */
 #if !defined( posixconfigENABLE_PTHREAD_CONDATTR_T ) || ( posixconfigENABLE_PTHREAD_CONDATTR_T == 1 )
-    typedef void            * pthread_condattr_t;
+    typedef void                     * pthread_condattr_t;
 #endif
 
 /**
  * @brief Used for mutexes.
+ *
  * Enabled/disabled by posixconfigENABLE_PTHREAD_MUTEX_T.
  */
 #if !defined( posixconfigENABLE_PTHREAD_MUTEX_T ) || ( posixconfigENABLE_PTHREAD_MUTEX_T == 1 )
-    typedef void            * pthread_mutex_t;
+    typedef PthreadMutexType_t       pthread_mutex_t;
 #endif
 
 /**
  * @brief Used to identify a mutex attribute object.
+ *
  * Enabled/disabled by posixconfigENABLE_PTHREAD_MUTEXATTR_T.
  */
 #if !defined( posixconfigENABLE_PTHREAD_MUTEXATTR_T ) || ( posixconfigENABLE_PTHREAD_MUTEXATTR_T == 1 )
-    typedef void            * pthread_mutexattr_t;
+    typedef PthreadMutexAttrType_t   pthread_mutexattr_t;
 #endif
 
 /**
  * @brief Used to identify a thread.
- * Enabled/disabled by posixconfigENABLE_PTHREAD_T
+ *
+ * Enabled/disabled by posixconfigENABLE_PTHREAD_T.
  */
 #if !defined( posixconfigENABLE_PTHREAD_T ) || ( posixconfigENABLE_PTHREAD_T == 1 )
-    typedef void            * pthread_t;
+    typedef void                     * pthread_t;
 #endif
 
 /**
  * @brief Used for a count of bytes or an error indication.
+ *
  * Enabled/disabled by posixconfigENABLE_SSIZE_T.
  */
 #if !defined( posixconfigENABLE_SSIZE_T ) || ( posixconfigENABLE_SSIZE_T == 1 )
-    typedef int             ssize_t;
+    typedef int                      ssize_t;
 #endif
 
 /**
  * @brief Used for time in seconds.
+ *
  * Enabled/disabled by posixconfigENABLE_TIME_T.
  */
 #if !defined( posixconfigENABLE_TIME_T ) || ( posixconfigENABLE_TIME_T == 1 )
-    typedef int64_t         time_t;
+    typedef int64_t                  time_t;
 #endif
 
 /**
  * @brief Used for timer ID returned by timer_create().
+ *
  * Enabled/disabled by posixconfigENABLE_TIMER_T.
  */
 #if !defined( posixconfigENABLE_TIMER_T ) || ( posixconfigENABLE_TIMER_T == 1 )
-    typedef void            * timer_t;
+    typedef void                     * timer_t;
 #endif
 
 /**
  * @brief Used for time in microseconds.
+ *
  * Enabled/disabled by posixconfigENABLE_USECONDS_T.
  */
 #if !defined( posixconfigENABLE_USECONDS_T ) || ( posixconfigENABLE_USECONDS_T == 1 )
-    typedef unsigned long   useconds_t;
+    typedef unsigned long            useconds_t;
+#endif
+
+/**
+ * @brief Used for file sizes.
+ *
+ * Enabled/disabled by posixconfigENABLE_OFF_T.
+ */
+#if !defined( posixconfigENABLE_OFF_T ) || ( posixconfigENABLE_OFF_T == 1 )
+    typedef long int                 off_t;
 #endif
 
 #endif /* ifndef _FREERTOS_POSIX_TYPES_H_ */

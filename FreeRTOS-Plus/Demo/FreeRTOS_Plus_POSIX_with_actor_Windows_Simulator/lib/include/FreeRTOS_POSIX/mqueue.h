@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS+POSIX V1.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Amazon FreeRTOS POSIX V1.1.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -59,10 +59,10 @@ struct mq_attr
  *
  * @retval 0 - Upon successful completion
  * @retval -1 - A error occurred. errno is also set.
- * 
- * \sideeffect Possible errno values
+ *
+ * @sideeffect Possible errno values
  * <br>
- * EBADF - The mqdes argument is not a valid message queue descriptor. 
+ * EBADF - The mqdes argument is not a valid message queue descriptor.
  */
 int mq_close( mqd_t mqdes );
 
@@ -70,11 +70,11 @@ int mq_close( mqd_t mqdes );
  * @brief Get message queue attributes.
  *
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_getattr.html
- * 
+ *
  * @retval 0 - Upon successful completion
  * @retval -1 - A error occurred. errno is also set.
  *
- * \sideeffect Possible errno values
+ * @sideeffect Possible errno values
  * <br>
  * DBADF - The mqdes argument is not a valid message queue descriptor.
  */
@@ -86,21 +86,21 @@ int mq_getattr( mqd_t mqdes,
  *
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_open.html
  *
- * @note Supported name pattern: leading &lt;slash&gt; character in name is always required; 
- * the maximum length (excluding null-terminator) of the name argument can be NAME_MAX. 
- * The default value of NAME_MAX in FreeRTOS_POSIX_portable_default.h is 64, which can be 
+ * @note Supported name pattern: leading &lt;slash&gt; character in name is always required;
+ * the maximum length (excluding null-terminator) of the name argument can be NAME_MAX.
+ * The default value of NAME_MAX in FreeRTOS_POSIX_portable_default.h is 64, which can be
  * overwritten by user.
  * @note mode argument is not supported.
- * @note Supported oflags: O_RDWR, O_CREAT, O_EXCL, and O_NONBLOCK. 
+ * @note Supported oflags: O_RDWR, O_CREAT, O_EXCL, and O_NONBLOCK.
  *
  * @retval Message queue descriptor -- Upon successful completion
- * @retval (mqd_t) - 1 -- An error occurred. errno is also set. 
+ * @retval (mqd_t) - 1 -- An error occurred. errno is also set.
  *
- * \sideeffect Possible errno values
+ * @sideeffect Possible errno values
  * <br>
- * EINVAL - name argument is invalid (not following name pattern),  
- * OR if O_CREAT is specified in oflag with attr argument not NULL and either mq_maxmsg or mq_msgsize is equal to or less than zero, 
- * OR either O_CREAT or O_EXCL is not set and a queue with the same name is unlinked but pending to be removed. 
+ * EINVAL - name argument is invalid (not following name pattern),
+ * OR if O_CREAT is specified in oflag with attr argument not NULL and either mq_maxmsg or mq_msgsize is equal to or less than zero,
+ * OR either O_CREAT or O_EXCL is not set and a queue with the same name is unlinked but pending to be removed.
  * <br>
  * EEXIST - O_CREAT and O_EXCL are set and the named message queue already exists.
  * <br>
@@ -119,18 +119,18 @@ mqd_t mq_open( const char * name,
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html
  *
  * @note msg_prio argument is not supported. Messages are not checked for corruption.
- * 
- * @retval The length of the selected message in bytes - Upon successful completion. 
+ *
+ * @retval The length of the selected message in bytes - Upon successful completion.
  * The message is removed from the queue
  * @retval -1 - An error occurred. errno is also set.
  *
- * \sideeffect Possible errno values
+ * @sideeffect Possible errno values
  * <br>
  * EBADF - The mqdes argument is not a valid message queue descriptor open for reading.
  * <br>
  * EMSGSIZE - The specified message buffer size, msg_len, is less than the message size attribute of the message queue.
  * <br>
- * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened, 
+ * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened,
  * but no message arrived on the queue before the specified timeout expired.
  * <br>
  * EAGAIN - O_NONBLOCK was set in the message description associated with mqdes, and the specified message queue is empty.
@@ -146,23 +146,22 @@ ssize_t mq_receive( mqd_t mqdes,
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html
  *
  * @note msg_prio argument is not supported.
- * 
+ *
  * @retval 0 - Upon successful completion.
- * @retval -1 - An error occurred. errno is also set. 
- * 
- * \sideeffect Possible errno values
+ * @retval -1 - An error occurred. errno is also set.
+ *
+ * @sideeffect Possible errno values
  * <br>
  * EBADF - The mqdes argument is not a valid message queue descriptor open for writing.
  * <br>
- * EMSGSIZE - The specified message length, msg_len, exceeds the message size attribute of the message queue, 
+ * EMSGSIZE - The specified message length, msg_len, exceeds the message size attribute of the message queue,
  * OR insufficient memory for the message to be sent.
  * <br>
- * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened, 
+ * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened,
  * but the timeout expired before the message could be added to the queue.
  * <br>
- * EAGAIN - The O_NONBLOCK flag is set in the message queue description associated with mqdes, 
+ * EAGAIN - The O_NONBLOCK flag is set in the message queue description associated with mqdes,
  * and the specified message queue is full.
- * 
  */
 int mq_send( mqd_t mqdes,
              const char * msg_ptr,
@@ -175,21 +174,21 @@ int mq_send( mqd_t mqdes,
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedreceive.html
  *
  * @note msg_prio argument is not supported. Messages are not checked for corruption.
- * 
- * @retval The length of the selected message in bytes - Upon successful completion. 
+ *
+ * @retval The length of the selected message in bytes - Upon successful completion.
  * The message is removed from the queue
  * @retval -1 - An error occurred. errno is also set.
- * 
- * \sideeffect Possible errno values
+ *
+ * @sideeffect Possible errno values
  * <br>
  * EBADF - The mqdes argument is not a valid message queue descriptor open for reading.
  * <br>
  * EMSGSIZE - The specified message buffer size, msg_len, is less than the message size attribute of the message queue.
  * <br>
- * EINVAL - The process or thread would have blocked, and the abstime parameter specified a nanoseconds field value 
+ * EINVAL - The process or thread would have blocked, and the abstime parameter specified a nanoseconds field value
  * less than zero or greater than or equal to 1000 million.
  * <br>
- * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened, 
+ * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened,
  * but no message arrived on the queue before the specified timeout expired.
  * <br>
  * EAGAIN - O_NONBLOCK was set in the message description associated with mqdes, and the specified message queue is empty.
@@ -206,26 +205,25 @@ ssize_t mq_timedreceive( mqd_t mqdes,
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html
  *
  * @note msg_prio argument is not supported.
- * 
+ *
  * @retval 0 - Upon successful completion.
- * @retval -1 - An error occurred. errno is also set. 
- * 
- * \sideeffect Possible errno values
+ * @retval -1 - An error occurred. errno is also set.
+ *
+ * @sideeffect Possible errno values
  * <br>
  * EBADF - The mqdes argument is not a valid message queue descriptor open for writing.
  * <br>
- * EMSGSIZE - The specified message length, msg_len, exceeds the message size attribute of the message queue, 
+ * EMSGSIZE - The specified message length, msg_len, exceeds the message size attribute of the message queue,
  * OR insufficient memory for the message to be sent.
  * <br>
- * EINVAL - The process or thread would have blocked, and the abstime parameter specified a nanoseconds field 
+ * EINVAL - The process or thread would have blocked, and the abstime parameter specified a nanoseconds field
  * value less than zero or greater than or equal to 1000 million.
  * <br>
- * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened, 
+ * ETIMEDOUT - The O_NONBLOCK flag was not set when the message queue was opened,
  * but the timeout expired before the message could be added to the queue.
  * <br>
- * EAGAIN - The O_NONBLOCK flag is set in the message queue description associated with mqdes, 
+ * EAGAIN - The O_NONBLOCK flag is set in the message queue description associated with mqdes,
  * and the specified message queue is full.
- * 
  */
 int mq_timedsend( mqd_t mqdes,
                   const char * msg_ptr,
@@ -237,11 +235,11 @@ int mq_timedsend( mqd_t mqdes,
  * @brief Remove a message queue.
  *
  * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_unlink.html
- * 
+ *
  * @retval 0 - Upon successful completion.
- * @retval -1 - An error occurred. errno is also set. 
- * 
- * \sideeffect Possible errno values
+ * @retval -1 - An error occurred. errno is also set.
+ *
+ * @sideeffect Possible errno values
  * <br>
  * EINVAL - name argument is invalid. Refer to requirements on name argument in mq_open().
  * <br>

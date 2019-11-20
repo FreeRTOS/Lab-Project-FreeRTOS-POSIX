@@ -73,6 +73,7 @@
 /* System headers. */
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 /* Demo includes. */
 #include "posix_demo.h"
@@ -270,10 +271,13 @@ static void * prvDispatcherThread( void * pvArgs )
  *
  * See the top of this file for detailed description.
  */
-void vStartPOSIXDemo( void )
+void vStartPOSIXDemo( void *pvParameters )
 {
     int i = 0;
     int iStatus = 0;
+
+	/* Remove warnings about unused parameters. */
+    ( void ) pvParameters;
 
     /* Handles of the threads and related resources. */
     DispatcherThreadResources_t pxDispatcher = { 0 };
@@ -363,4 +367,8 @@ void vStartPOSIXDemo( void )
     {
         printf( "Queues did not get initialized properly. Did not run demo. %s", LINE_BREAK );
     }
+
+	/* This task was created with the native xTaskCreate() API function, so
+	must not run off the end of its implementing thread. */
+	vTaskDelete( NULL );
 }
