@@ -371,11 +371,6 @@ void vStartPOSIXDemo( void * pvParameters )
 
     /* This task was created with the native xTaskCreate() API function, so
      * must not run off the end of its implementing thread. */
-    printf( "\n------ SUMMARY ------\n" );
-    static char status[ 40 * 100 ] = { 0 };
-    vTaskList( status );
-    printf( status );
-    printf( "\n" );
     vTaskDelete( NULL );
 }
 
