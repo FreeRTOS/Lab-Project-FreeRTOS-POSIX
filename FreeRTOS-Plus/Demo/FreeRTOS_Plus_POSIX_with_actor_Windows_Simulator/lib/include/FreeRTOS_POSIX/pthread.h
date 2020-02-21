@@ -234,6 +234,16 @@ int pthread_barrier_init( pthread_barrier_t * barrier,
 int pthread_barrier_wait( pthread_barrier_t * barrier );
 
 /**
+* @brief Request cancellation of thread.
+* 
+* @see https://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
+* 
+* @retval 0 - Upon successful completion.
+* @retval ESRCH - Upon attempt to cancel null thread.
+*/
+int pthread_cancel( pthread_t thread );
+
+/**
  * @brief Thread creation.
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
@@ -354,6 +364,7 @@ int pthread_getschedparam( pthread_t thread,
  *                   to a joinable thread OR multiple simultaneous calls to pthread_join()
  *                   specifying the same target thread OR the value specified by the thread argument
  *                   to pthread_join() refers to the calling thread.
+ * @retval ESRCH - Upon attempt to join null thread.
  */
 int pthread_join( pthread_t thread,
                   void ** retval );
