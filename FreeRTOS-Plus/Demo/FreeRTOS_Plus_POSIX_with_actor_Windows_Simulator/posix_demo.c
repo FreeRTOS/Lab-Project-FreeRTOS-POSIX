@@ -439,6 +439,7 @@ void vTestPthreadCancel( void * pvParameters )
     pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_JOINABLE );
 
     printf( "\nCreating then deleting various threads...\n" );
+
     /* The first half is default (joinable) the second half is detached*/
     for( int i = 0; i < N_DUMMY_THREADS; i++ )
     {
