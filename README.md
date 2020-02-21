@@ -6,23 +6,10 @@ With FreeRTOS+POSIX, an existing POSIX threading compliant application can be po
 
 For more on FreeRTOS+POSIX, please visit [freertos.org](https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_POSIX/index.html)
 
-The demo project is located under ```FreeRTOS-Plus\Demo\FreeRTOS_Plus_POSIX_with_actor_Windows_Simulator```. 
+This repository only contains source code. For demo applications, please visit https://github.com/FreeRTOS/FreeRTOS-Labs. 
 
-## Cloning
-This repo uses [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to bring in dependent components.
+## To consume FreeRTOS+POSIX 
+It is recommended to use this repository as a submodule. Please refer to [Git Tools — Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules). 
 
-Note: If you download the ZIP file provided by GitHub UI, you will not get the contents of the submodules. (The ZIP file is also not a valid git repository)
-
-To clone using HTTPS:
-```
-git clone https://github.com/FreeRTOS/Lab-Project-FreeRTOS-POSIX.git --recurse-submodules
-```
-Using SSH:
-```
-git clone git@github.com:FreeRTOS/Lab-Project-FreeRTOS-POSIX.git --recurse-submodules
-```
-
-If you have downloaded the repo without using the `--recurse-submodules` argument, you need to run:
-```
-git submodule update --init --recursive
-```
+## Notes
+This project is undergoing optimizations or refactorization to improve memory usage, modularity, documentation, demo usability, or test coverage. 
