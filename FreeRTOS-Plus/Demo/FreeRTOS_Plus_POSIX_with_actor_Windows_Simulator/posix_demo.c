@@ -272,12 +272,12 @@ static void * prvDispatcherThread( void * pvArgs )
  *
  * See the top of this file for detailed description.
  */
-void vStartPOSIXDemo( void *pvParameters )
+void vStartPOSIXDemo( void * pvParameters )
 {
     int i = 0;
     int iStatus = 0;
 
-	/* Remove warnings about unused parameters. */
+    /* Remove warnings about unused parameters. */
     ( void ) pvParameters;
 
     /* Handles of the threads and related resources. */
@@ -369,145 +369,152 @@ void vStartPOSIXDemo( void *pvParameters )
         printf( "Queues did not get initialized properly. Did not run demo. %s", LINE_BREAK );
     }
 
-	/* This task was created with the native xTaskCreate() API function, so
-	must not run off the end of its implementing thread. */
-    printf("\n------ SUMMARY ------\n");
-    static char status[40 * 100] = { 0 };
-    vTaskList(status);
-    printf(status);
-    printf("\n");
-	vTaskDelete( NULL );
+    /* This task was created with the native xTaskCreate() API function, so
+     * must not run off the end of its implementing thread. */
+    printf( "\n------ SUMMARY ------\n" );
+    static char status[ 40 * 100 ] = { 0 };
+    vTaskList( status );
+    printf( status );
+    printf( "\n" );
+    vTaskDelete( NULL );
 }
 
 
 /*-----------------------------------------------------------*/
-#define N_DUMMY_THREADS 10
-#define N_DUMMY_LOOPS   100
+#define N_DUMMY_THREADS    10
+#define N_DUMMY_LOOPS      100
 
-static void * prvDummyThread(void* pvArgs)
+static void * prvDummyThread( void * pvArgs )
 {
-    int id = (int)pvArgs;
+    int id = ( int ) pvArgs;
 
-    struct timespec ts = {
-        .tv_sec = 1,
+    struct timespec ts =
+    {
+        .tv_sec  = 1,
         .tv_nsec = 0
     };
 
-    for (int i = 0; i < N_DUMMY_LOOPS; i++)
+    for( int i = 0; i < N_DUMMY_LOOPS; i++ )
     {
-        printf("Thread[%02d] loop[%02d]\n", id, i);
-        nanosleep(&ts, NULL);
+        printf( "Thread[%02d] loop[%02d]\n", id, i );
+        nanosleep( &ts, NULL );
     }
 
-    while (1);
+    while( 1 )
+    {
+    }
 
     return 0;
 }
 
-static void * prvSelfDestructThread(void* pvArgs)
+static void * prvSelfDestructThread( void * pvArgs )
 {
-    struct timespec ts = {
-        .tv_sec = 1,
+    struct timespec ts =
+    {
+        .tv_sec  = 1,
         .tv_nsec = 0
     };
 
-    nanosleep(&ts, NULL);
-    configASSERT(0 == pthread_cancel(pthread_self()));
+    nanosleep( &ts, NULL );
+    configASSERT( 0 == pthread_cancel( pthread_self() ) );
 
     ts.tv_sec = 1;
-    while (1) {
-        nanosleep(&ts, NULL);
+
+    while( 1 )
+    {
+        nanosleep( &ts, NULL );
     }
 }
 
 /*
  * Create various joinable/detached threads and cancel/join them in various orders
  */
-void vTestPthreadCancel(void* pvParameters)
+void vTestPthreadCancel( void * pvParameters )
 {
     pthread_attr_t pattr;
     struct sched_param sched_config;
-    pthread_t threads[N_DUMMY_THREADS] = { 0 };
-    pthread_attr_init(&pattr);
+    pthread_t threads[ N_DUMMY_THREADS ] = { 0 };
+
+    pthread_attr_init( &pattr );
 
     /* Want these tasks of equal priority so they can preempt eachother. The spawner task (THIS) will
-       exhaustively cancel all the threads with pthread_cancel */
-    sched_config.sched_priority = uxTaskPriorityGet(NULL);
-    pthread_attr_setschedparam(&pattr, &sched_config);
-    pthread_attr_setdetachstate(&pattr, PTHREAD_CREATE_JOINABLE);
+     * exhaustively cancel all the threads with pthread_cancel */
+    sched_config.sched_priority = uxTaskPriorityGet( NULL );
+    pthread_attr_setschedparam( &pattr, &sched_config );
+    pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_JOINABLE );
 
 
-    printf("Creating %d threads looping %d times\n", N_DUMMY_THREADS, N_DUMMY_LOOPS);
+    printf( "Creating %d threads looping %d times\n", N_DUMMY_THREADS, N_DUMMY_LOOPS );
+
     /* The first half is default (joinable) the second half is detached*/
-    for (int i = 0; i < N_DUMMY_THREADS; i++)
+    for( int i = 0; i < N_DUMMY_THREADS; i++ )
     {
-        if (i == (N_DUMMY_THREADS / 2))
+        if( i == ( N_DUMMY_THREADS / 2 ) )
         {
-           pthread_attr_setdetachstate(&pattr, PTHREAD_CREATE_DETACHED);
+            pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_DETACHED );
         }
 
-        pthread_create(&threads[i], &pattr, prvDummyThread, (void *)i);
+        pthread_create( &threads[ i ], &pattr, prvDummyThread, ( void * ) i );
     }
-    
-    struct timespec ts = {
-        .tv_sec = 1,
+
+    struct timespec ts =
+    {
+        .tv_sec  = 1,
         .tv_nsec = 0
     };
 
     /*Let the test threads run for a bit, then exercise typical cancellation*/
-    for (int i=0; i < N_DUMMY_THREADS; i++)
+    for( int i = 0; i < N_DUMMY_THREADS; i++ )
     {
-        nanosleep(&ts, NULL);
+        nanosleep( &ts, NULL );
 
-        if (i < (N_DUMMY_THREADS / 2))
+        if( i < ( N_DUMMY_THREADS / 2 ) )
         {
             /* A cancelled joinable thread won't have relinquished its resources, but instead will suspend to joining */
-            configASSERT(0 == pthread_cancel(threads[i]));
-            configASSERT(0 == pthread_join(threads[i], NULL));
+            configASSERT( 0 == pthread_cancel( threads[ i ] ) );
+            configASSERT( 0 == pthread_join( threads[ i ], NULL ) );
         }
         else
         {
             /* A detached thread will fully relinquish resources its responsible for */
-            configASSERT(0 == pthread_cancel(threads[i]));
+            configASSERT( 0 == pthread_cancel( threads[ i ] ) );
         }
     }
-   
+
     /* Excercise cancelling a NULL thread */
-    configASSERT(ESRCH == pthread_cancel(NULL));
+    configASSERT( ESRCH == pthread_cancel( NULL ) );
 
     /* Exercise a thread cancelling itself using pthread_cancel */
     pthread_t self_desctructor = NULL;
     /* detached thread */
-    pthread_attr_setdetachstate(&pattr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&self_desctructor, &pattr, prvSelfDestructThread, NULL); 
+    pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_DETACHED );
+    pthread_create( &self_desctructor, &pattr, prvSelfDestructThread, NULL );
     /* joinable thread */
-    pthread_attr_setdetachstate(&pattr, PTHREAD_CREATE_JOINABLE);
-    pthread_create(&self_desctructor, &pattr, prvSelfDestructThread, NULL);
-    configASSERT(0 == pthread_join(self_desctructor, NULL));
-    
+    pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_JOINABLE );
+    pthread_create( &self_desctructor, &pattr, prvSelfDestructThread, NULL );
+    configASSERT( 0 == pthread_join( self_desctructor, NULL ) );
+
     /* Excercise double cancellation of: */
     pthread_t doubly_cancelled = NULL;
     /* detached thread */
-    pthread_attr_setdetachstate(&pattr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&doubly_cancelled, &pattr, prvDummyThread, NULL);
-    pthread_cancel(doubly_cancelled);
-    pthread_cancel(doubly_cancelled);
+    pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_DETACHED );
+    pthread_create( &doubly_cancelled, &pattr, prvDummyThread, NULL );
+    pthread_cancel( doubly_cancelled );
+    pthread_cancel( doubly_cancelled );
 
     /* joinable thread */
-    pthread_attr_setdetachstate(&pattr, PTHREAD_CREATE_JOINABLE);
-    pthread_create(&doubly_cancelled, &pattr, prvDummyThread, NULL);
-    pthread_cancel(doubly_cancelled);
-    pthread_cancel(doubly_cancelled);
-    configASSERT(0 == pthread_join(doubly_cancelled, NULL));
+    pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_JOINABLE );
+    pthread_create( &doubly_cancelled, &pattr, prvDummyThread, NULL );
+    pthread_cancel( doubly_cancelled );
+    pthread_cancel( doubly_cancelled );
+    configASSERT( 0 == pthread_join( doubly_cancelled, NULL ) );
 
     /* All threads should be cancelled by now, leaving only this, main, idle, and timer tasks*/
-    printf("\n------ SUMMARY ------\n");
-    nanosleep(&ts, NULL);
-    static char status[40 * (N_DUMMY_THREADS + 5 + 3)] = { 0 };
-    vTaskList(status);
-    printf(status);
-    printf("\n");
-    vTaskDelete(NULL);
+    printf( "\n------ SUMMARY ------\n" );
+    nanosleep( &ts, NULL );
+    static char status[ 40 * ( N_DUMMY_THREADS + 5 + 3 ) ] = { 0 };
+    vTaskList( status );
+    printf( status );
+    printf( "\n" );
+    vTaskDelete( NULL );
 }
-
-

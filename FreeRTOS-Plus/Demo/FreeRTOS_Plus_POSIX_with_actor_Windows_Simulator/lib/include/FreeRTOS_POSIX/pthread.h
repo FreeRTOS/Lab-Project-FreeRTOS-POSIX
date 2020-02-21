@@ -234,13 +234,13 @@ int pthread_barrier_init( pthread_barrier_t * barrier,
 int pthread_barrier_wait( pthread_barrier_t * barrier );
 
 /**
-* @brief Request cancellation of thread.
-* 
-* @see https://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
-* 
-* @retval 0 - Upon successful completion.
-* @retval ESRCH - Upon attempt to cancel null thread.
-*/
+ * @brief Request cancellation of thread.
+ *
+ * @see https://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
+ *
+ * @retval 0 - Upon successful completion.
+ * @retval ESRCH - Upon attempt to cancel null thread.
+ */
 int pthread_cancel( pthread_t thread );
 
 /**
