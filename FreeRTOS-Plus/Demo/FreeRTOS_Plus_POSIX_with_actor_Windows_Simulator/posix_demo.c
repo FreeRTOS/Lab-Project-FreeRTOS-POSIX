@@ -438,9 +438,7 @@ void vTestPthreadCancel( void * pvParameters )
     pthread_attr_setschedparam( &pattr, &sched_config );
     pthread_attr_setdetachstate( &pattr, PTHREAD_CREATE_JOINABLE );
 
-
-    printf( "Creating %d threads looping %d times\n", N_DUMMY_THREADS, N_DUMMY_LOOPS );
-
+    printf( "\nCreating then deleting various threads...\n" );
     /* The first half is default (joinable) the second half is detached*/
     for( int i = 0; i < N_DUMMY_THREADS; i++ )
     {
@@ -505,6 +503,7 @@ void vTestPthreadCancel( void * pvParameters )
     configASSERT( 0 == pthread_join( doubly_cancelled, NULL ) );
 
     /* All threads should be cancelled by now, leaving only this, main, idle, and timer tasks*/
+    printf( "Done.\n" );
     printf( "\n------ SUMMARY ------\n" );
     nanosleep( &ts, NULL );
     static char status[ 40 * ( N_DUMMY_THREADS + 5 + 3 ) ] = { 0 };
