@@ -409,19 +409,11 @@ int pthread_join( pthread_t pthread,
     int iStatus = 0;
     pthread_internal_t * pxThread = ( pthread_internal_t * ) pthread;
 
-    if( pxThread == NULL )
-    {
-        iStatus = ESRCH;
-    }
-
     /* Make sure pthread is joinable. Otherwise, this function would block
      * forever waiting for an unjoinable thread. */
-    if( iStatus == 0 )
+    if( !pthreadIS_JOINABLE( pxThread->xAttr.usSchedPriorityDetachState ) )
     {
-        if( !pthreadIS_JOINABLE( pxThread->xAttr.usSchedPriorityDetachState ) )
-        {
-            iStatus = EDEADLK;
-        }
+        iStatus = EDEADLK;
     }
 
     /* Only one thread may attempt to join another. Lock the join mutex
@@ -487,14 +479,9 @@ int pthread_cancel( pthread_t pthread )
     int iStatus = 0;
     pthread_internal_t * pxThread = ( pthread_internal_t * ) pthread;
 
-    if( ( pxThread == NULL ) || ( pxThread->xTaskHandle == NULL ) )
-    {
-        iStatus = ESRCH;
-    }
-
     /* Threads may already be successfully ended elsewhere and pending full deletion in idle task. */
     /* Note the the xJoinBarrier is a binary sem, so no new queue items are made once its already given */
-    if( ( iStatus == 0 ) && ( eDeleted != eTaskGetState( pxThread->xTaskHandle ) ) )
+    if( pxThread && pxThread->xTaskHandle && ( eDeleted != eTaskGetState( pxThread->xTaskHandle ) ) )
     {
         if( pxThread == pthread_self() )
         {
