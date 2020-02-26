@@ -132,6 +132,7 @@ int sem_timedwait( sem_t * sem,
     int iStatus = 0;
     sem_internal_t * pxSem = ( sem_internal_t * ) ( sem );
     TickType_t xDelay = portMAX_DELAY;
+    int iPreviousValue = Atomic_Decrement_u32( ( uint32_t * ) &pxSem->value );
 
     if( abstime != NULL )
     {
@@ -164,8 +165,6 @@ int sem_timedwait( sem_t * sem,
             }
         }
     }
-
-    int iPreviousValue = Atomic_Decrement_u32( ( uint32_t * ) &pxSem->value );
 
     /* If previous semaphore value is larger than zero, the thread entering this function call
      * can take the semaphore without yielding. Else (<=0), calling into FreeRTOS API to yield.
