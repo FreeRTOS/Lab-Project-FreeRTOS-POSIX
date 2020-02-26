@@ -292,3 +292,5 @@ int pthread_cond_wait( pthread_cond_t * cond,
 {
     return pthread_cond_timedwait( cond, mutex, NULL );
 }
+
+/*-----------------------------------------------------------*/

@@ -163,3 +163,5 @@ int pthread_barrier_wait( pthread_barrier_t * barrier )
 
     return iStatus;
 }
+
+/*-----------------------------------------------------------*/
