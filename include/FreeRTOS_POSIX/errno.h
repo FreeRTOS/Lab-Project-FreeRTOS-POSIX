@@ -36,6 +36,10 @@
 #ifndef _FREERTOS_POSIX_ERRNO_H_
 #define _FREERTOS_POSIX_ERRNO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Undefine all errnos to avoid redefinition errors with system errnos. */
 #undef EPERM
 #undef ENOENT
@@ -91,5 +95,9 @@
     #define errno    FreeRTOS_errno
 #endif
 /**@} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ifndef _FREERTOS_POSIX_ERRNO_H_ */

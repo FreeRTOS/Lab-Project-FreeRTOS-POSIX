@@ -33,6 +33,10 @@
 #ifndef _FREERTOS_POSIX_TYPES_H_
 #define _FREERTOS_POSIX_TYPES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* C standard library includes. */
 #include <stdint.h>
 
@@ -186,6 +190,10 @@ typedef void                         * pthread_barrierattr_t;
  */
 #if !defined( posixconfigENABLE_OFF_T ) || ( posixconfigENABLE_OFF_T == 1 )
     typedef long int                 off_t;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* ifndef _FREERTOS_POSIX_TYPES_H_ */
