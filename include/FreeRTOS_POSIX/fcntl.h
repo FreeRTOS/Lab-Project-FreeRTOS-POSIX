@@ -33,6 +33,10 @@
 #ifndef _FREERTOS_POSIX_FCNTL_H_
 #define _FREERTOS_POSIX_FCNTL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name File creation flags for use in the oflag value to open() and openat().
  */
@@ -75,5 +79,9 @@
 #define O_SEARCH    0x4000  /**< Open directory for search only. */
 #define O_WRONLY    0x8000  /**< Open for writing only. */
 /**@} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ifndef _FREERTOS_POSIX_FCNTL_H_ */

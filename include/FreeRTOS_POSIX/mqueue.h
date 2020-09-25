@@ -33,6 +33,10 @@
 #ifndef _FREERTOS_POSIX_MQUEUE_H_
 #define _FREERTOS_POSIX_MQUEUE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* FreeRTOS+POSIX includes. */
 #include "FreeRTOS_POSIX/time.h"
 
@@ -246,5 +250,9 @@ int mq_timedsend( mqd_t mqdes,
  * ENOENT - The named message queue does not exist.
  */
 int mq_unlink( const char * name );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ifndef _FREERTOS_POSIX_MQUEUE_H_ */

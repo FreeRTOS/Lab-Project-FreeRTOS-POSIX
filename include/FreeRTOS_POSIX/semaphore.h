@@ -37,6 +37,10 @@
 #include "FreeRTOS_POSIX/time.h"
 #include "FreeRTOS_POSIX_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Semaphore type.
  */
@@ -139,5 +143,9 @@ int sem_trywait( sem_t * sem );
  * @note Deadlock detection is not implemented.
  */
 int sem_wait( sem_t * sem );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ifndef _FREERTOS_POSIX_SEMAPHORE_H_ */
