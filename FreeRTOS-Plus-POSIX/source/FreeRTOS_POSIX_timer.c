@@ -196,6 +196,7 @@ int timer_settime( timer_t timerid,
     TimerHandle_t xTimerHandle = timerid;
     timer_internal_t * pxTimer = ( timer_internal_t * ) pvTimerGetTimerID( xTimerHandle );
     TickType_t xNextTimerExpiration = 0, xTimerExpirationPeriod = 0;
+    BaseType_t xTimerCommandSent = pdFAIL;
 
     /* Validate the value argument, but only if the timer isn't being disarmed. */
     if( TIMESPEC_IS_NOT_ZERO( value->it_value ) )
@@ -283,7 +284,13 @@ int timer_settime( timer_t timerid,
         {
             /* Set the timer to expire at the it_value, then start it. */
             ( void ) xTimerChangePeriod( xTimerHandle, xNextTimerExpiration, portMAX_DELAY );
-            ( void ) xTimerStart( xTimerHandle, xNextTimerExpiration );
+            xTimerCommandSent = xTimerStart( xTimerHandle, xNextTimerExpiration );
+
+            /* Wait until the timer start command is processed. */
+            while( ( xTimerCommandSent != pdFAIL ) && ( xTimerIsTimerActive( xTimerHandle ) == pdFALSE ) )
+            {
+                vTaskDelay( 1 );
+            }
         }
     }
 
