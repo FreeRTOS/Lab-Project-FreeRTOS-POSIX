@@ -140,6 +140,9 @@
 #ifndef posixconfigENABLE_PTHREAD_BARRIER_T
     #define posixconfigENABLE_PTHREAD_BARRIER_T      1 /**< pthread_barrier_t in sys/types.h */
 #endif
+#ifndef posixconfigENABLE_SCHED_PARAM
+    #define posixconfigENABLE_SCHED_PARAM            1 /**< sched_param in sched.h */
+#endif
 /**@} */
 
 #endif /* ifndef _FREERTOS_POSIX_PORTABLE_DEFAULT_H_ */
