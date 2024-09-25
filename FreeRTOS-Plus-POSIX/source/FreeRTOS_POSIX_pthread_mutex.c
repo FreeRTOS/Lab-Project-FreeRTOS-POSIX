@@ -148,18 +148,8 @@ int pthread_mutex_init( pthread_mutex_t * mutex,
             ( void ) xSemaphoreCreateMutexStatic( &pxMutex->xMutex );
         }
 
-        /* Ensure that the FreeRTOS mutex was successfully created. */
-        if( ( SemaphoreHandle_t ) &pxMutex->xMutex == NULL )
-        {
-            /* Failed to create mutex. Set error EAGAIN and free mutex object. */
-            iStatus = EAGAIN;
-            vPortFree( pxMutex );
-        }
-        else
-        {
-            /* Mutex successfully created. */
-            pxMutex->xIsInitialized = pdTRUE;
-        }
+        /* Mutex successfully created. */
+        pxMutex->xIsInitialized = pdTRUE;
     }
 
     return iStatus;
