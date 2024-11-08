@@ -249,37 +249,37 @@ int pthread_cond_timedwait( pthread_cond_t * cond,
         iLocalWaitingThreads = Atomic_Increment_u32( ( uint32_t * ) &pxCond->iWaitingThreads );
 
         iStatus = pthread_mutex_unlock( mutex );
-    }
 
-    /* Wait on the condition variable. */
-    if( iStatus == 0 )
-    {
-        if( xSemaphoreTake( ( SemaphoreHandle_t ) &pxCond->xCondWaitSemaphore,
-                            xDelay ) == pdPASS )
+        /* Wait on the condition variable. */
+        if( iStatus == 0 )
         {
-            /* When successful, relock mutex. */
-            iStatus = pthread_mutex_lock( mutex );
+            if( xSemaphoreTake( ( SemaphoreHandle_t ) &pxCond->xCondWaitSemaphore,
+                                xDelay ) == pdPASS )
+            {
+                /* When successful, relock mutex. */
+                iStatus = pthread_mutex_lock( mutex );
+            }
+            else
+            {
+                /* Timeout. Relock mutex and decrement number of waiting threads. */
+                iStatus = ETIMEDOUT;
+                ( void ) pthread_mutex_lock( mutex );
+
+                /* Atomically decrements thread waiting by 1.
+                 * If iLocalWaitingThreads is updated by other thread(s) in between,
+                 * this implementation guarantees to decrement by 1 based on the
+                 * value currently in pxCond->iWaitingThreads. */
+                prvTestAndDecrement( pxCond, iLocalWaitingThreads + 1 );
+            }
         }
         else
         {
-            /* Timeout. Relock mutex and decrement number of waiting threads. */
-            iStatus = ETIMEDOUT;
-            ( void ) pthread_mutex_lock( mutex );
-
             /* Atomically decrements thread waiting by 1.
              * If iLocalWaitingThreads is updated by other thread(s) in between,
              * this implementation guarantees to decrement by 1 based on the
              * value currently in pxCond->iWaitingThreads. */
             prvTestAndDecrement( pxCond, iLocalWaitingThreads + 1 );
         }
-    }
-    else
-    {
-        /* Atomically decrements thread waiting by 1.
-         * If iLocalWaitingThreads is updated by other thread(s) in between,
-         * this implementation guarantees to decrement by 1 based on the
-         * value currently in pxCond->iWaitingThreads. */
-        prvTestAndDecrement( pxCond, iLocalWaitingThreads + 1 );
     }
 
     return iStatus;
