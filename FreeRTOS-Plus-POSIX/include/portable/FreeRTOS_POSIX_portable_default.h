@@ -63,6 +63,14 @@
 /**@} */
 
 /**
+ * @name Defaults for POSIX conditions implementation.
+ */
+/**@{ */
+#ifndef posixconfigPTHREAD_COND_MAX_WAITERS
+    #define posixconfigPTHREAD_COND_MAX_WAITERS 4 /**< Maximum number of tasks that can wait on a cond at one time */
+#endif
+
+/**
  * @name POSIX implementation-dependent constants usually defined in limits.h.
  *
  * They are defined here to provide portability between platforms.
