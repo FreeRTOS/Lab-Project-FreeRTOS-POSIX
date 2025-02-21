@@ -283,8 +283,7 @@ int timer_settime( timer_t timerid,
         else
         {
             /* Set the timer to expire at the it_value, then start it. */
-            ( void ) xTimerChangePeriod( xTimer, xNextTimerExpiration, portMAX_DELAY );
-            xTimerCommandSent = xTimerStart( xTimer, xNextTimerExpiration );
+            xTimerCommandSent = xTimerChangePeriod( xTimer, xNextTimerExpiration, xNextTimerExpiration );
 
             /* Wait until the timer start command is processed. */
             while( ( xTimerCommandSent != pdFAIL ) && ( xTimerIsTimerActive( xTimer ) == pdFALSE ) )
