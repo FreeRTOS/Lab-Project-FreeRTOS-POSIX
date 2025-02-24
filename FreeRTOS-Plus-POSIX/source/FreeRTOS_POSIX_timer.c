@@ -54,6 +54,7 @@ typedef struct timer_internal
     StaticTimer_t xTimerBuffer;  /**< Memory that holds the FreeRTOS timer. */
     struct sigevent xTimerEvent; /**< What to do when this timer expires. */
     TickType_t xTimerPeriod;     /**< Period of this timer. */
+    UBaseType_t uxTimerCallbackInvocations; /**< Number of times the timer callback has been invoked. */
 } timer_internal_t;
 
 /*-----------------------------------------------------------*/
@@ -94,6 +95,7 @@ void prvTimerCallback( TimerHandle_t xTimer )
                                      pxTimer->xTimerEvent.sigev_value.sival_ptr );
         }
     }
+    pxTimer->uxTimerCallbackInvocations++;
 }
 
 /*-----------------------------------------------------------*/
@@ -273,6 +275,9 @@ int timer_settime( timer_t timerid,
             }
         }
 
+        /* Set uxTimerCallbackInvocations before timer start. */
+        pxTimer->uxTimerCallbackInvocations = 0
+
         /* If xNextTimerExpiration is still 0, that means that it_value specified
          * an absolute timeout in the past. Per POSIX spec, a notification should be
          * triggered immediately. */
@@ -286,7 +291,9 @@ int timer_settime( timer_t timerid,
             xTimerCommandSent = xTimerChangePeriod( xTimer, xNextTimerExpiration, xNextTimerExpiration );
 
             /* Wait until the timer start command is processed. */
-            while( ( xTimerCommandSent != pdFAIL ) && ( xTimerIsTimerActive( xTimer ) == pdFALSE ) )
+            while( ( xTimerCommandSent != pdFAIL ) &&
+                   ( xTimerIsTimerActive( xTimer ) == pdFALSE ) &&
+                   ( pxTimer->uxTimerCallbackInvocations == 0 ) )
             {
                 vTaskDelay( 1 );
             }
