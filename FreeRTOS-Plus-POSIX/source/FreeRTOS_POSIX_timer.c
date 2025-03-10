@@ -59,6 +59,14 @@ typedef struct timer_internal
 
 /*-----------------------------------------------------------*/
 
+static void * prvInvokeApplicationTimerCallback( void * arg )
+{
+    timer_internal_t * pxTimer = ( timer_internal_t * ) arg;
+    pxTimer->xTimerEvent.sigev_notify_function( pxTimer->xTimerEvent.sigev_value );
+    return NULL;
+}
+/*-----------------------------------------------------------*/
+
 void prvTimerCallback( TimerHandle_t xTimer )
 {
     timer_internal_t * pxTimer = ( timer_internal_t * ) pvTimerGetTimerID( xTimer );
@@ -91,8 +99,8 @@ void prvTimerCallback( TimerHandle_t xTimer )
         {
             ( void ) pthread_create( &xTimerNotificationThread,
                                      pxTimer->xTimerEvent.sigev_notify_attributes,
-                                     ( void * ( * )( void * ) )pxTimer->xTimerEvent.sigev_notify_function,
-                                     pxTimer->xTimerEvent.sigev_value.sival_ptr );
+                                     prvInvokeApplicationTimerCallback,
+                                     pxTimer );
         }
     }
     pxTimer->uxTimerCallbackInvocations++;
@@ -114,7 +122,11 @@ int timer_create( clockid_t clockid,
      * sigev_notify is SIGEV_SIGNAL. SIGEV_SIGNAL is currently not supported. */
     if( ( evp == NULL ) || ( evp->sigev_notify == SIGEV_SIGNAL ) )
     {
-        errno = ENOTSUP;
+        #if ( configUSE_POSIX_ERRNO == 1 )
+        {
+            errno = ENOTSUP;
+        }
+        #endif
         iStatus = -1;
     }
 
@@ -125,7 +137,11 @@ int timer_create( clockid_t clockid,
 
         if( pxTimer == NULL )
         {
-            errno = EAGAIN;
+            #if ( configUSE_POSIX_ERRNO == 1 )
+            {
+                errno = EAGAIN;
+            }
+            #endif
             iStatus = -1;
         }
     }
@@ -206,7 +222,11 @@ int timer_settime( timer_t timerid,
         if( ( UTILS_ValidateTimespec( &value->it_interval ) == false ) ||
             ( UTILS_ValidateTimespec( &value->it_value ) == false ) )
         {
-            errno = EINVAL;
+            #if ( configUSE_POSIX_ERRNO == 1 )
+            {
+                errno = EINVAL;
+            }
+            #endif
             iStatus = -1;
         }
     }
