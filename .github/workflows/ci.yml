@@ -1,0 +1,63 @@
+name: Build Check
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  bashPass: \033[32;1mPASSED -
+  bashWarn: \033[33;1mWARNING -
+  bashFail: \033[31;1mFAILED -
+  bashEnd:  \033[0m
+
+jobs:
+  BUILD-CHECK:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          stepName: Checkout Repository
+        name: ${{ env.stepName }}
+        uses: actions/checkout@v4
+
+      - env:
+          stepName: Install Tools
+        name: ${{ env.stepName }}
+        shell: bash
+        run: |
+          # ${{ env.stepName }}
+          echo -e "::group::${{ env.stepName }}"
+          set +e
+          sudo apt-get -y update
+          sudo apt-get -y install build-essential
+          exitStatus=$?
+          set -e
+          echo -e "::endgroup::"
+          if [ $exitStatus -eq 0 ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+
+      - env:
+          stepName: Build
+        name: ${{ env.stepName }}
+        id: build-test
+        shell: bash
+        working-directory: test/posix_build_test
+        run: |
+          # ${{ env.stepName }}
+          echo -e "::group::${{ env.stepName }}"
+          set +e
+          cmake -S . -B build
+          make -C build -j
+          exitStatus=$?
+          set -e
+          echo -e "::endgroup::"
+          if [ $exitStatus -eq 0 ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
