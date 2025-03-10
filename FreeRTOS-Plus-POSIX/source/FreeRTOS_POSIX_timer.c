@@ -276,7 +276,7 @@ int timer_settime( timer_t timerid,
         }
 
         /* Set uxTimerCallbackInvocations before timer start. */
-        pxTimer->uxTimerCallbackInvocations = 0
+        pxTimer->uxTimerCallbackInvocations = 0;
 
         /* If xNextTimerExpiration is still 0, that means that it_value specified
          * an absolute timeout in the past. Per POSIX spec, a notification should be
