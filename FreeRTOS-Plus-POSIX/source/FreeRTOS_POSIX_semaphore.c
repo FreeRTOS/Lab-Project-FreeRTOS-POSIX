@@ -84,7 +84,11 @@ int sem_init( sem_t * sem,
     /* Check value parameter. */
     if( value > SEM_VALUE_MAX )
     {
-        errno = EINVAL;
+        #if ( configUSE_POSIX_ERRNO == 1 )
+        {
+            errno = EINVAL;
+        }
+        #endif
         iStatus = -1;
     }
 
@@ -182,11 +186,19 @@ int sem_timedwait( sem_t * sem,
         {
             if( iStatus == 0 )
             {
-                errno = ETIMEDOUT;
+                #if ( configUSE_POSIX_ERRNO == 1 )
+                {
+                    errno = ETIMEDOUT;
+                }
+                #endif
             }
             else
             {
-                errno = iStatus;
+                #if ( configUSE_POSIX_ERRNO == 1 )
+                {
+                    errno = iStatus;
+                }
+                #endif
             }
 
             iStatus = -1;
@@ -214,10 +226,14 @@ int sem_trywait( sem_t * sem )
 
     /* POSIX specifies that this function should set errno to EAGAIN and not
      * ETIMEDOUT. */
-    if( ( iStatus == -1 ) && ( errno == ETIMEDOUT ) )
+    #if ( configUSE_POSIX_ERRNO == 1 )
     {
-        errno = EAGAIN;
+        if( ( iStatus == -1 ) && ( errno == ETIMEDOUT ) )
+        {
+            errno = EAGAIN;
+        }
     }
+    #endif
 
     return iStatus;
 }

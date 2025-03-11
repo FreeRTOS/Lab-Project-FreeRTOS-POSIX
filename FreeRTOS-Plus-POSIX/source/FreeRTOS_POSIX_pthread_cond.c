@@ -54,7 +54,7 @@ static bool prvInitializeStaticCond( pthread_cond_internal_t * pxCond );
 
 static bool prvInitializeStaticCond( pthread_cond_internal_t * pxCond )
 {
-    unsigned i = 0;
+    int i = 0;
 
     /* Check if the condition variable needs to be initialized. */
     if( pxCond->xIsInitialized == pdFALSE )
@@ -92,7 +92,7 @@ static bool prvInitializeStaticCond( pthread_cond_internal_t * pxCond )
 
 int pthread_cond_broadcast( pthread_cond_t * cond )
 {
-    unsigned i = 0;
+    int i = 0;
     pthread_cond_internal_t * pxCond = ( pthread_cond_internal_t * ) ( cond );
 
     /* If the cond is uninitialized, perform initialization. */
@@ -138,7 +138,7 @@ int pthread_cond_destroy( pthread_cond_t * cond )
 int pthread_cond_init( pthread_cond_t * cond,
                        const pthread_condattr_t * attr )
 {
-    unsigned i = 0;
+    int i = 0;
     int iStatus = 0;
     pthread_cond_internal_t * pxCond = ( pthread_cond_internal_t * ) cond;
 
@@ -178,7 +178,7 @@ int pthread_cond_init( pthread_cond_t * cond,
 
 int pthread_cond_signal( pthread_cond_t * cond )
 {
-    unsigned i = 0;
+    int i = 0;
     TaskHandle_t* xTaskToNotify = NULL;
     pthread_cond_internal_t * pxCond = ( pthread_cond_internal_t * ) ( cond );
 
@@ -188,7 +188,7 @@ int pthread_cond_signal( pthread_cond_t * cond )
         return ENOMEM;
     }
 
-    /* Enter critical section to protect task list access and 
+    /* Enter critical section to protect task list access and
      * prevent this task from being switched out while notifying
      * the blocked task */
     taskENTER_CRITICAL();
@@ -238,7 +238,7 @@ int pthread_cond_timedwait( pthread_cond_t * cond,
                             pthread_mutex_t * mutex,
                             const struct timespec * abstime )
 {
-    unsigned i = 0;
+    int i = 0;
     int iStatus = 0;
     bool iSet = pdFALSE;
     pthread_cond_internal_t * pxCond = ( pthread_cond_internal_t * ) ( cond );
@@ -269,7 +269,7 @@ int pthread_cond_timedwait( pthread_cond_t * cond,
 
     if( iStatus == 0 )
     {
-        /* Enter critical section to protect task list access and 
+        /* Enter critical section to protect task list access and
          * prevent this task from being switched out while adding
          * itself to the notify list */
         taskENTER_CRITICAL();
