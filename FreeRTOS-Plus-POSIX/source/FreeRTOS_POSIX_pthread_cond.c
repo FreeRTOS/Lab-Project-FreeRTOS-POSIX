@@ -61,7 +61,7 @@ static bool prvInitializeStaticCond( pthread_cond_internal_t * pxCond )
     {
         /* Cond initialization must be in a critical section to prevent two threads
          * from initializing it at the same time. */
-        taskENTER_CRITICAL();
+        vTaskSuspendAll();
 
         /* Check again that the cond is still uninitialized, i.e. it wasn't
          * initialized while this function was waiting to enter the critical
@@ -82,7 +82,7 @@ static bool prvInitializeStaticCond( pthread_cond_internal_t * pxCond )
         }
 
         /* Exit the critical section. */
-        taskEXIT_CRITICAL();
+        xTaskResumeAll();
     }
 
     return pxCond->xIsInitialized;
