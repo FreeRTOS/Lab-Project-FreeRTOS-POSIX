@@ -102,6 +102,7 @@ static void prvExitThread( void )
     pthread_internal_t * pxThread = ( pthread_internal_t * ) pthread_self();
 
     vTaskSuspendAll();
+
     /* If this thread is joinable, wait for a call to pthread_join. */
     if( pthreadIS_JOINABLE( pxThread->xAttr.usSchedPriorityDetachState ) )
     {
@@ -362,7 +363,7 @@ int pthread_create( pthread_t * thread,
         }
 
         /* End the critical section. */
-        xTaskResumeAll();
+        ( void ) xTaskResumeAll();
     }
 
     return iStatus;
@@ -470,7 +471,7 @@ int pthread_join( pthread_t pthread,
         vPortFree( pxThread );
 
         /* End the critical section. */
-        xTaskResumeAll();
+        ( void ) xTaskResumeAll();
     }
 
     return iStatus;
@@ -529,7 +530,7 @@ int pthread_detach(pthread_t pthread)
         }
 
         /* End the critical section. */
-        xTaskResumeAll();
+        ( void ) xTaskResumeAll();
     }
 
     return iStatus;
