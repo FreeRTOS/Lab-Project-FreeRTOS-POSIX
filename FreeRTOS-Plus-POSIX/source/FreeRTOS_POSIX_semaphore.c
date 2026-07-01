@@ -184,6 +184,9 @@ int sem_timedwait( sem_t * sem,
         if( xSemaphoreTake( ( SemaphoreHandle_t ) &pxSem->xSemaphore,
                             xDelay ) != pdTRUE )
         {
+            /* Restore the wait attempt because no semaphore was taken. */
+            ( void ) Atomic_Increment_u32( ( uint32_t * ) &pxSem->value );
+
             if( iStatus == 0 )
             {
                 #if ( configUSE_POSIX_ERRNO == 1 )
